@@ -1,7 +1,7 @@
 ---
 title: "ESM 207 Homework #3"
 author: "Pat Byrne"
-date: "4/20/2020"
+date: "5/10/2020"
 output: html_document
 ---
 
@@ -81,12 +81,12 @@ For higher income consumers:
 $P = b_H + a_H*Q_H$
 Then, $Q_H = \frac{P - b_H}{a_H}$
 
-Aggregate Daily Demand Curve = $Q_L + Q_H$
-If Q < $\frac{b_L - b_H}{a_H}$  then P =  $b_H - a_H*Q$
-If Q >= `r round(((b_L - b_H)/a_H),2)`  then P = $\frac{a_H * a_L}{a_h + a_L}*Q + \frac{a_H}{a_H + a_L}*b_L + \frac{a_L}{a_h + a_L}*b_H$
+Aggregate Daily Demand Curve = $Q_T = Q_L + Q_H$
+If $Q < \frac{b_L - b_H}{a_H}$  then $P = b_H - a_H*Q$
+If $Q >= \frac{b_L - b_H}{a_H}$  then $P = (\frac{a_H * a_L}{a_h + a_L})Q_T + (\frac{a_H}{a_H + a_L})b_L + (\frac{a_L}{a_h + a_L})b_H$
 
 Supply Curve:
-$P = \frac{P_{eq}}{Q_{eq}}*Q_T$ where $P_{eq}$ is given and $Q_{eq}$ is found by calculating $Q_H + Q_L$ at $P_{eq}$. We know the intercept is 0, and the slope is just $\frac{rise}{run}$
+$P = (\frac{P_{eq}}{Q_{eq}})Q_T$ where $P_{eq}$ is given and $Q_{eq}$ is found by calculating $Q_H + Q_L$ at $P_{eq}$. We know the intercept is 0, and the slope is just $\frac{rise}{run}$
 
 ## Question 1.
 ```{r}
@@ -104,13 +104,13 @@ benefit.producers.1 <- (P_eq*Q_eq) - as.numeric(integral.producers$value)
 # Benefit to consumers (most easily found by doing each separately and then adding - THIS IS THE ANSWER TO QUESTION 2.):
 integrand.low <- function(x) {b_L + a_L*x}
 integral.low <- integrate(integrand.low, 0, Q_L)
-benefit.low <- as.numeric(integral.low$value) - P_eq*Q_L
+benefit.low.1 <- as.numeric(integral.low$value) - P_eq*Q_L
 
 integrand.high <- function(x) {b_H + a_H*x}
 integral.high <- integrate(integrand.high, 0, Q_H)
-benefit.high <- as.numeric(integral.high$value) - P_eq*Q_H
+benefit.high.1 <- as.numeric(integral.high$value) - P_eq*Q_H
 
-benefit.consumers.1 = benefit.low + benefit.high
+benefit.consumers.1 = benefit.low.1 + benefit.high.1
 
 # Environmental costs: $1.50/gal locally, $0.50/gal globally
 env.cost.local.1 = Q_eq*1.5
@@ -119,15 +119,14 @@ env.cost.global.1 = Q_eq*0.5
 ```
 
 ## Question 3.
-The equation for the supply curve has changed, and is now $P = \frac{P_{eq}}{Q_{eq}}*Q_T + 1$ We must now solve for the new $P_{eq}$ to be plugged in below as P_eq.2
+The equation for the supply curve has changed, and is now $P = (\frac{P_{eq}}{Q_{eq}})Q_T + tax$ 
 ```{r}
-# 
-t = 1
+# P_eq and Q_eq are the original values. Q_eq.2 is the new equilibrium aggregate quantity of gasoline demanded, and P_eq.2 is the new price per gallon based on that quantity
+t = 1 # t = tax
 Q_eq.2 = (  (a_H/(a_H + a_L)*b_L) + (a_L/(a_H + a_L)*b_H) - t ) / ( (P_eq/Q_eq) -  (a_H*a_L)/(a_H + a_L)  )
 P_eq.2 = (P_eq/Q_eq)*Q_eq.2 + t
 Q_L.2 = (P_eq.2 - b_L)/a_L
 Q_H.2 = (P_eq.2 - b_H)/a_H
-
 
 
 # Benefit to producers:
@@ -150,7 +149,7 @@ benefit.consumers.2 = benefit.low.2 + benefit.high.2
 env.cost.local.2 = Q_eq.2*1.5
 env.cost.global.2 = Q_eq.2*0.5
 
-tax_revenue = Q_eq.2*t
+tax_revenue.1 = Q_eq.2*t
 
 ```
 
@@ -226,8 +225,8 @@ env.cost.global.5 = Q_eq.5*0.5
 ## Question 6.
 ```{r}
 # We iterate this chunk with different values of t until env.cost.local.6 - env.cost.local.5 is 0
-t = 7.29985
-Q_eq.6 = (  (a_H/(a_H + a_L)*b_L) + (a_L/(a_H + a_L)*b_H) - t ) / ( (P_eq/Q_eq) -  (a_H*a_L)/(a_H + a_L)  )
+t.6 = 7.29985
+Q_eq.6 = (  (a_H/(a_H + a_L)*b_L) + (a_L/(a_H + a_L)*b_H) - t.6 ) / ( (P_eq/Q_eq) -  (a_H*a_L)/(a_H + a_L)  )
 
 env.cost.local.6 = Q_eq.6*1.5
 
@@ -235,6 +234,65 @@ local.damage.diff = env.cost.local.6 - env.cost.local.5
 ```
 
 
+## Summary Chunk:
+Run this chunk and then open up the console
+```{r}
+# Question 1.
+# Aggregate daily demand curve is above the Question 1. chunk, as is the supply curve
+# Benefit to consumers
+benefit.consumers.1
+# Benefit to producers
+benefit.producers.1
+# Environmental Costs
+# Locally
+env.cost.local.1
+# Globally
+env.cost.global.1 
+
+# Question 2.
+benefit.low.1 
+benefit.high.1
+
+# Question 3.
+# a.
+Q_eq - Q_eq.2
+Q_L - Q_L.2
+Q_H - Q_H.2
+# b.
+P_eq - P_eq.2
+# c.
+benefit.high.1 - benefit.high.2
+# d.
+benefit.low.1 - benefit.low.2
+# e.
+benefit.producers.1 - benefit.producers.2
+# f.
+env.cost.local.1 - env.cost.local.2
+# g.
+env.cost.global.1 - env.cost.global.2
+# h. 
+tax_revenue.1
+
+# Question 4.
+# a. b. c.
+results.question.4
+
+# Question 5.
+# a.
+Q_H - Q_H.5  
+# b.
+Q_L - Q_L.5 
+# c.
+P_eq - P_eq.5 
+# d.
+env.cost.local.1 - env.cost.local.5
+# e.
+env.cost.global.1 - env.cost.global.5
+
+# Question 6. 
+t.6
+env.cost.local.5 - env.cost.local.6 # .5 is electric cars and .6 is $T/gal tax  -  in the code, T = t.6
+```
 
 
 
